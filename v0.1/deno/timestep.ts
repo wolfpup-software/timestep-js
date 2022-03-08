@@ -4,4 +4,4 @@ export type {
   TimestepStatus,
 } from "./fixed_timestep/fixed_timestep_types.ts";
 
-export { FixedTimestep } from "./fixed_timestep/fixed_timestep.ts";
+export { FixedTimestep as Timestep } from "./fixed_timestep/fixed_timestep.ts";
