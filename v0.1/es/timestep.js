@@ -14,7 +14,7 @@ class FixedTimestep {
     this.receipt = window.requestAnimationFrame(this.loop);
   }
   stop() {
-    if (this.status === "STOPPED" && this.receipt !== -1) return;
+    if (this.status === "STOPPED" || this.receipt === -1) return;
     this.status = "STOPPED";
     window.cancelAnimationFrame(this.receipt);
   }
@@ -22,10 +22,13 @@ class FixedTimestep {
     const prevTime = this.time;
     this.time = performance.now();
     const delta = this.time - prevTime;
-    if (delta > this.ctx.maxTimestep) {
+    if (delta < this.ctx.timestepInterval) {
+      this.receipt = window.requestAnimationFrame(this.loop);
+      return;
+    }
+    this.accumulatorTime += delta;
+    if (this.accumulatorTime > this.ctx.maxTimestep) {
       this.accumulatorTime = this.ctx.maxTimestep;
-    } else {
-      this.accumulatorTime += delta;
     }
     while (this.accumulatorTime >= this.ctx.timestepInterval) {
       this.ctx.integrate(this.totalTime, this.accumulatorTime);
@@ -37,4 +40,4 @@ class FixedTimestep {
     this.receipt = window.requestAnimationFrame(this.loop);
   };
 }
-export { FixedTimestep as FixedTimestep };
+export { FixedTimestep as Timestep };

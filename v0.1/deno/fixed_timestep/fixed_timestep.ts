@@ -29,7 +29,7 @@ class FixedTimestep implements TimestepInterface {
   }
 
   stop() {
-    if (this.status === "STOPPED" && this.receipt !== -1) return;
+    if (this.status === "STOPPED" || this.receipt === -1) return;
 
     this.status = "STOPPED";
     window.cancelAnimationFrame(this.receipt);
@@ -44,16 +44,16 @@ class FixedTimestep implements TimestepInterface {
     // add to the time difference
     const delta = this.time - prevTime;
 
-    // off chance delta time is less than interval
-    // if (delta < this.ctx.timestepInterval) {
-    //   this.receipt = window.requestAnimationFrame(this.loop);
-    // }
+    // offchance delta is less than timestep
+    if (delta < this.ctx.timestepInterval) {
+      this.receipt = window.requestAnimationFrame(this.loop);
+      return;
+    }
 
     // Compound delta time or max out
-    if (delta > this.ctx.maxTimestep) {
+    this.accumulatorTime += delta;
+    if (this.accumulatorTime > this.ctx.maxTimestep) {
       this.accumulatorTime = this.ctx.maxTimestep;
-    } else {
-      this.accumulatorTime += delta;
     }
 
     // iterate through fixed timestep intervals
