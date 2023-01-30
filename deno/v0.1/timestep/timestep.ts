@@ -1,13 +1,28 @@
-import type { RenderInterface, TimestepContext, TimestepInterface } from "../type_flyweight/timestep.ts";
+import type { RenderInterface, TimestepContextInterface, TimestepInterface } from "../type_flyweight/timestep.ts";
 
+class TimestepContext implements TimestepContextInterface {
+	prevTimestamp: number = 0;
+	timestamp: number = 0;
+	delta: number = 0;
+	physicsInterval: number = 0;
+	physicsAccumulator: number = 0;
+	renderInterval: number = 0;
+	renderAccumulator: number = 0;
+	
+	constructor(physicsInterval: number, renderInterval: number) {
+		this.physicsInterval = physicsInterval;
+		this.renderInterval = renderInterval
+	}
+}
 
 class Timestep implements TimestepInterface {
 	ctx!: TimestepContext;
 	renderer!: RenderInterface;
 	
+	// specfic to browser animation frames
 	receipt = -1;
 	
-  start(ctx: TimestepContext, renderer: RenderInterface) {
+  start(ctx: TimestepContextInterface, renderer: RenderInterface) {
     if (this.receipt !== -1) return;
     
     this.ctx = ctx;
@@ -24,31 +39,31 @@ class Timestep implements TimestepInterface {
 
 	loop() {
 		// swap values
-    const prevTimestamp = this.ctx.timestamp;
+    this.ctx.prevTimestamp = this.ctx.timestamp;
     this.ctx.timestamp = performance.now();
-    this.ctx.delta = this.ctx.timestamp - prevTimestamp;
+    this.ctx.delta = this.ctx.timestamp - this.ctx.prevTimestamp;
     
     // get delta diff since last render
     // add to the time difference
     // offchance delta is less than timestep, skip
-    this.ctx.accumulatorTime += this.ctx.delta;
-    if (this.ctx.accumulatorTime < this.ctx.timestepInterval) {
+    this.ctx.physicsAccumulator += this.ctx.delta;
+    if (this.ctx.physicsAccumulator < this.ctx.physicsInterval) {
       this.receipt = window.requestAnimationFrame(this.loop);
       return;
     }
 
     // iterate through fixed timestep intervals
     // delta on context will let integration step to decide physics requirements
-    while (this.ctx.phsyicsAccumulator > this.ctx.physicsInterval) {
-      this.ctx.phsyicsAccumulator -= this.ctx.physicsInterval;
-      this.renderCtx.integrate(this.ctx);
+    while (this.ctx.physicsAccumulator > this.ctx.physicsInterval) {
+      this.ctx.physicsAccumulator -= this.ctx.physicsInterval;
+      this.renderer.integrate(this.ctx);
     }
 
     // distance between last timestep
     // render after fps
-    this.ctx.renderAccumulator += delta
+    this.ctx.renderAccumulator += this.ctx.delta
     if (this.ctx.renderAccumulator > this.ctx.renderInterval) {
-        this.renderCtx.render(this.ctx);
+        this.renderer.render(this.ctx);
     }
     
     // reduce accumulator for next render
@@ -60,3 +75,5 @@ class Timestep implements TimestepInterface {
     this.receipt = window.requestAnimationFrame(this.loop);
 	}
 }
+
+export { Timestep, TimestepContext }

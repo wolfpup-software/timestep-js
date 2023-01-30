@@ -1,4 +1,5 @@
-interface TimestepContext {
+interface TimestepContextInterface {
+	prevTimestamp: number;
 	timestamp: number;
 	delta: number;
 	physicsInterval: number;
@@ -8,14 +9,13 @@ interface TimestepContext {
 }
 
 interface RenderInterface {
-	integrate: (ctx: TimestepContext) => void;
-	render: (ctx: TimestepContext) => void;
+	integrate: (ctx: TimestepContextInterface) => void;
+	render: (ctx: TimestepContextInterface) => void;
 }
 
 interface TimestepInterface {
-	start(): void;
+	start(ctx: TimestepContextInterface, renderer: RenderInterface): void;
 	stop(): void;
-	loop(): void;
 }
 
-export { RenderInterface, TimestepContext, TimestepInterface }
+export type { RenderInterface, TimestepContextInterface, TimestepInterface }
