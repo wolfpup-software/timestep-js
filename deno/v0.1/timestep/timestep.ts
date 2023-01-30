@@ -14,7 +14,6 @@ class Timestep implements TimestepInterface {
 	
   start() {
     if (this.receipt !== -1) return;
-  	
     this.receipt = window.requestAnimationFrame(this.loop);
   }
 
