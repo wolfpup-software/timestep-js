@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
     "lib": ["dom", "esnext"],
-    "strict": true
   }
 }
