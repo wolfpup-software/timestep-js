@@ -1,28 +1,25 @@
-import type { RenderInterface, TimestepContextInterface, TimestepInterface } from "../type_flyweight/timestep.ts";
+import type { RendererInterface, TimestepContextInterface, TimestepInterface } from "../type_flyweight/timestep.ts";
 
-class TimestepContext implements TimestepContextInterface {
-	prevTimestamp: number = 0;
-	timestamp: number = 0;
-	delta: number = 0;
-	physicsInterval: number = 0;
-	physicsAccumulator: number = 0;
-	renderInterval: number = 0;
-	renderAccumulator: number = 0;
-	
-	constructor(physicsInterval: number, renderInterval: number) {
-		this.physicsInterval = physicsInterval;
-		this.renderInterval = renderInterval
+function createContext(physicsInterval: number, renderInterval: number): TimestepContextInterface {
+	return {
+		prevTimestamp: performance.now(),
+		timestamp: performance.now(),
+		delta: 0,
+		physicsAccumulator: 0,
+		renderAccumulator: 0,
+		physicsInterval,
+		renderInterval,
 	}
 }
 
 class Timestep implements TimestepInterface {
-	ctx!: TimestepContext;
-	renderer!: RenderInterface;
+	ctx!: TimestepContextInterface;
+	renderer!: RendererInterface;
 	
 	// specfic to browser animation frames
 	receipt = -1;
 	
-  start(ctx: TimestepContextInterface, renderer: RenderInterface) {
+  start(ctx: TimestepContextInterface, renderer: RendererInterface) {
     if (this.receipt !== -1) return;
     
     this.ctx = ctx;
@@ -76,4 +73,4 @@ class Timestep implements TimestepInterface {
 	}
 }
 
-export { Timestep, TimestepContext }
+export { Timestep, createContext }

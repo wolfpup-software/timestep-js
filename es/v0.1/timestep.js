@@ -2,18 +2,16 @@
 // deno-lint-ignore-file
 // This code was bundled using `deno bundle` and it's not recommended to edit it manually
 
-class TimestepContext {
-    prevTimestamp = 0;
-    timestamp = 0;
-    delta = 0;
-    physicsInterval = 0;
-    physicsAccumulator = 0;
-    renderInterval = 0;
-    renderAccumulator = 0;
-    constructor(physicsInterval, renderInterval){
-        this.physicsInterval = physicsInterval;
-        this.renderInterval = renderInterval;
-    }
+function createContext(physicsInterval, renderInterval) {
+    return {
+        prevTimestamp: performance.now(),
+        timestamp: performance.now(),
+        delta: 0,
+        physicsAccumulator: 0,
+        renderAccumulator: 0,
+        physicsInterval,
+        renderInterval
+    };
 }
 class Timestep {
     ctx;
@@ -53,4 +51,4 @@ class Timestep {
         this.receipt = window.requestAnimationFrame(this.loop);
     }
 }
-export { Timestep as Timestep, TimestepContext as TimestepContext };
+export { Timestep as Timestep, createContext as createContext };

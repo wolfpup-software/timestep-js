@@ -8,14 +8,14 @@ interface TimestepContextInterface {
 	renderAccumulator: number;
 }
 
-interface RenderInterface {
+interface RendererInterface {
 	integrate: (ctx: TimestepContextInterface) => void;
 	render: (ctx: TimestepContextInterface) => void;
 }
 
 interface TimestepInterface {
-	start(ctx: TimestepContextInterface, renderer: RenderInterface): void;
+	start(ctx: TimestepContextInterface, renderer: RendererInterface): void;
 	stop(): void;
 }
 
-export type { RenderInterface, TimestepContextInterface, TimestepInterface }
+export type { RendererInterface, TimestepContextInterface, TimestepInterface }
