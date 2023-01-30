@@ -7,8 +7,11 @@ class Timestep implements TimestepInterface {
 	
 	receipt = -1;
 	
-  start(timestepCtx: TimestepContext, renderer: RenderInterface) {
+  start(ctx: TimestepContext, renderer: RenderInterface) {
     if (this.receipt !== -1) return;
+    
+    this.ctx = ctx;
+    this.renderer = renderer;
     this.receipt = window.requestAnimationFrame(this.loop);
   }
 
