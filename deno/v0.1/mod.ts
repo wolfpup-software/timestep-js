@@ -1,3 +1,7 @@
-export type { RendererInterface, TimestepContextInterface, TimestepInterface } from "./type_flyweight/timestep.ts";
+export type {
+  RendererInterface,
+  TimestepContextInterface,
+  TimestepInterface,
+} from "./type_flyweight/timestep.ts";
 
-export { Timestep, createContext} from "./timestep/timestep.ts";
+export { createContext, Timestep } from "./timestep/timestep.ts";
