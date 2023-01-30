@@ -1,18 +1,13 @@
-import type { TimestepInterface } from "timestep_types.ts";
+import type { RenderInterface, TimestepContext, TimestepInterface } from "../type_flyweight/timestep.ts";
 
 
 class Timestep implements TimestepInterface {
-	ctx;
-	renderCtx;
+	ctx!: TimestepContext;
+	renderer!: RenderInterface;
 	
 	receipt = -1;
 	
-	constructor(timestepCtx, renderCtx) {
-		this.ctx = timestepCtx;
-		this.renderCtx = renderCtx;
-	}
-	
-  start() {
+  start(timestepCtx: TimestepContext, renderer: RenderInterface) {
     if (this.receipt !== -1) return;
     this.receipt = window.requestAnimationFrame(this.loop);
   }
