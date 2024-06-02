@@ -8,15 +8,14 @@ Use `TimestepContext` to create a context for the `Timestep` object
 
 Create a `RenderContext` to provide callbacks for the `Timestep` object.
 
-```
-import {Timestep, TimestepContext} from "timestep/mod.ts";
-import { Renderer } from "my-renderer/renderer.ts";
+```ts
+import { Timestep } from "timestep/mod.ts";
+import { Renderer } from "my/application/renderer.ts";
 
-const ctx = new TimestepContext(90, 60);
 const renderer = new Renderer();
 
-const timestep = new Timestep();
-timestep.start(ctx, renderer);
+const timestep = new Timestep(10, renderer);
+timestep.start();
 ```
 
 ## License
