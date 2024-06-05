@@ -1,0 +1,9 @@
+{
+  "workspaces": [
+    "timestep"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "fmt": "npx prettier --write ./"
+  }
+}
