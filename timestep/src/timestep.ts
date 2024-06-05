@@ -1,6 +1,6 @@
 interface TimestepContextImpl {
-  prevTimestamp: number;
-  timestamp: number;
+  prevTimestamp: DOMHighResTimeStamp;
+  timestamp: DOMHighResTimeStamp;
   intervalMs: number;
   accumulator: number;
 }
@@ -61,6 +61,8 @@ class Timestep implements TimestepImpl {
       this.#tc.accumulator -= this.#tc.intervalMs;
       this.#rc.integrate(this.#tc);
     }
+
+    this.#rc.render(this.#tc);
 
     this.receipt = window.requestAnimationFrame(this.loop);
   }
