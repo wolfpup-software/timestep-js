@@ -1,22 +1,21 @@
-
-interface TimestepContextInterface {
+interface TimestepContextImpl {
   prevTimestamp: number;
   timestamp: number;
   intervalMs: number;
   accumulator: number;
 }
 
-interface RendererInterface {
-  integrate: (ctx: TimestepContextInterface) => void;
-  render: (ctx: TimestepContextInterface) => void;
+interface RendererImpl {
+  integrate: (ctx: TimestepContext) => void;
+  render: (ctx: TimestepContext) => void;
 }
 
-interface TimestepInterface {
-  start(ctx: TimestepContextInterface, renderer: RendererInterface): void;
+interface TimestepImpl {
+  start(ctx: TimestepContext, renderer: RendererImpl): void;
   stop(): void;
 }
 
-class TimestepContext {
+class TimestepContext implements TimestepContextImpl {
   prevTimestamp = performance.now();
   timestamp = performance.now();
   accumulator = 0;
@@ -27,14 +26,14 @@ class TimestepContext {
   }
 }
 
-class Timestep implements TimestepInterface {
-  #tc: TimestepContextInterface;
-  #renderer: RendererInterface;
+class Timestep implements TimestepImpl {
+  #tc: TimestepContextImpl;
+  #rc: RendererImpl;
   receipt = -1;
 
-  constructor(intervalMs: number, renderer: RendererInterface) {
-    this.#tc = new TimestepContext(intervalMs)
-    this.#renderer = renderer;
+  constructor(intervalMs: number, renderer: RendererImpl) {
+    this.#tc = new TimestepContext(intervalMs);
+    this.#rc = renderer;
     this.loop = this.loop.bind(this);
   }
 
@@ -52,19 +51,20 @@ class Timestep implements TimestepInterface {
   loop() {
     if (this.receipt === -1) return;
 
-    // swap values
     this.#tc.prevTimestamp = this.#tc.timestamp;
     this.#tc.timestamp = performance.now();
-    let delta = this.#tc.timestamp - this.#tc.prevTimestamp;
 
+    let delta = this.#tc.timestamp - this.#tc.prevTimestamp;
     this.#tc.accumulator += delta;
+
     while (this.#tc.accumulator > this.#tc.intervalMs) {
       this.#tc.accumulator -= this.#tc.intervalMs;
-      this.#renderer.integrate(this.#tc);
+      this.#rc.integrate(this.#tc);
     }
 
     this.receipt = window.requestAnimationFrame(this.loop);
   }
 }
 
+export type { TimestepContextImpl, TimestepImpl, RendererImpl };
 export { TimestepContext, Timestep };
