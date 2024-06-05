@@ -1,5 +1,5 @@
 {
-  "name": "timestep-js",
+  "name": "timestep",
   "version": "0.1.0",
   "description": "fixed timestep for the browser",
   "type": "module",
