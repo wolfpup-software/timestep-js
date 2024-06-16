@@ -29,30 +29,31 @@ class TimestepContext implements TimestepContextImpl {
 class Timestep implements TimestepImpl {
   #tc: TimestepContextImpl;
   #rc: RendererImpl;
-  receipt = -1;
+  #receipt = -1;
+  #boundLoop: (now: DOMHighResTimeStamp) => void;
 
   constructor(intervalMs: number, renderer: RendererImpl) {
     this.#tc = new TimestepContext(intervalMs);
     this.#rc = renderer;
-    this.loop = this.loop.bind(this);
+    this.#boundLoop = this.#loop.bind(this);
   }
 
   start() {
-    if (this.receipt !== -1) return;
-    this.receipt = window.requestAnimationFrame(this.loop);
+    if (this.#receipt !== -1) return;
+    this.#receipt = window.requestAnimationFrame(this.#boundLoop);
   }
 
   stop() {
-    if (this.receipt === -1) return;
-    this.receipt = -1;
-    window.cancelAnimationFrame(this.receipt);
+    if (this.#receipt === -1) return;
+    this.#receipt = -1;
+    window.cancelAnimationFrame(this.#receipt);
   }
 
-  loop() {
-    if (this.receipt === -1) return;
+  #loop(now: DOMHighResTimeStamp) {
+    if (this.#receipt === -1) return;
 
     this.#tc.prevTimestamp = this.#tc.timestamp;
-    this.#tc.timestamp = performance.now();
+    this.#tc.timestamp = now;
 
     let delta = this.#tc.timestamp - this.#tc.prevTimestamp;
     this.#tc.accumulator += delta;
@@ -64,7 +65,7 @@ class Timestep implements TimestepImpl {
 
     this.#rc.render(this.#tc);
 
-    this.receipt = window.requestAnimationFrame(this.loop);
+    this.#receipt = window.requestAnimationFrame(this.#boundLoop);
   }
 }
 
