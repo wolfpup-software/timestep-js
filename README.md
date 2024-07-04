@@ -12,9 +12,11 @@ Create a `RenderContext` to provide callbacks for the `Timestep` object.
 import { Timestep } from "timestep/mod.ts";
 import { Renderer } from "my/application/renderer.ts";
 
-const renderer = new Renderer();
+function Renderer(delta: number) {
+    while
+};
 
-const timestep = new Timestep(10, renderer);
+const timestep = new Timestep(renderer);
 timestep.start();
 ```
 
