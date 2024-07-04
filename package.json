@@ -7,7 +7,6 @@
     "fmt": "npx prettier --write ./"
   },
   "devDependencies": {
-    "prettier": "^3.3.1",
     "typescript": "^5.4.5"
   }
 }

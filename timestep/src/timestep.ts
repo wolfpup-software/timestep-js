@@ -1,73 +1,61 @@
-interface TimestepContextImpl {
-  prevTimestamp: DOMHighResTimeStamp;
-  timestamp: DOMHighResTimeStamp;
-  intervalMs: number;
-  accumulator: number;
-}
-
 interface RendererImpl {
-  integrate: (ctx: TimestepContext) => void;
-  render: (ctx: TimestepContext) => void;
+	integrate: (stepMs: number, intervalMs: number) => void;
+	render: (lastStepMs: number, intervalMs: number) => void;
 }
 
 interface TimestepImpl {
-  start(ctx: TimestepContext, renderer: RendererImpl): void;
-  stop(): void;
+	start(): void;
+	stop(): void;
 }
 
-class TimestepContext implements TimestepContextImpl {
-  prevTimestamp = performance.now();
-  timestamp = performance.now();
-  accumulator = 0;
-  intervalMs = 10;
-
-  constructor(intervalMs: number) {
-    this.intervalMs = intervalMs;
-  }
-}
+let min_step_6 = (1 / 6) * 1000;
 
 class Timestep implements TimestepImpl {
-  #tc: TimestepContextImpl;
-  #rc: RendererImpl;
-  #receipt = -1;
-  #boundLoop: (now: DOMHighResTimeStamp) => void;
+	#rc: RendererImpl;
 
-  constructor(intervalMs: number, renderer: RendererImpl) {
-    this.#tc = new TimestepContext(intervalMs);
-    this.#rc = renderer;
-    this.#boundLoop = this.#loop.bind(this);
-  }
+	#timestamp = performance.now();
+	#time = 0;
+	#accumulator = 0;
+	#intervalMs: number;
 
-  start() {
-    if (this.#receipt !== -1) return;
-    this.#receipt = window.requestAnimationFrame(this.#boundLoop);
-  }
+	#receipt?: number = undefined;
 
-  stop() {
-    if (this.#receipt === -1) return;
-    this.#receipt = -1;
-    window.cancelAnimationFrame(this.#receipt);
-  }
+	#boundLoop: (now: DOMHighResTimeStamp) => void;
 
-  #loop(now: DOMHighResTimeStamp) {
-    if (this.#receipt === -1) return;
+	constructor(
+		renderer: RendererImpl,
+		intervalMs: number,
+	) {
+		this.#rc = renderer;
+		this.#intervalMs = Math.max(min_step_6, intervalMs);
+		this.#boundLoop = this.#loop.bind(this);
+	}
 
-    this.#tc.prevTimestamp = this.#tc.timestamp;
-    this.#tc.timestamp = now;
+	start() {
+		if (this.#receipt) return;
+		this.#receipt = window.requestAnimationFrame(this.#boundLoop);
+	}
 
-    let delta = this.#tc.timestamp - this.#tc.prevTimestamp;
-    this.#tc.accumulator += delta;
+	stop() {
+		window.cancelAnimationFrame(this.#receipt);
+		this.#receipt = undefined;
+	}
 
-    while (this.#tc.accumulator > this.#tc.intervalMs) {
-      this.#tc.accumulator -= this.#tc.intervalMs;
-      this.#rc.integrate(this.#tc);
-    }
+	#loop(now: DOMHighResTimeStamp) {
+		this.#accumulator += now - this.#timestamp;
+		this.#timestamp = now;
 
-    this.#rc.render(this.#tc);
+		while (this.#accumulator > this.#intervalMs) {
+			this.#rc.integrate(this.#time, this.#intervalMs);
 
-    this.#receipt = window.requestAnimationFrame(this.#boundLoop);
-  }
+			this.#accumulator -= this.#intervalMs;
+			this.#time += this.#intervalMs;
+		}
+
+		this.#rc.render(this.#accumulator, this.#intervalMs);
+		this.#receipt = window.requestAnimationFrame(this.#boundLoop);
+	}
 }
 
-export type { TimestepContextImpl, TimestepImpl, RendererImpl };
-export { TimestepContext, Timestep };
+export type { TimestepImpl, RendererImpl };
+export { Timestep };
