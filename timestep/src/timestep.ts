@@ -11,15 +11,13 @@ interface TimestepImpl {
 let min_step_6 = (1 / 6) * 1000;
 
 class Timestep implements TimestepImpl {
-	#rc: RendererImpl;
-
 	#timestamp = performance.now();
 	#time = 0;
 	#accumulator = 0;
-	#intervalMs: number;
-
 	#receipt?: number = undefined;
 
+	#rc: RendererImpl;
+	#intervalMs: number;
 	#boundLoop: (now: DOMHighResTimeStamp) => void;
 
 	constructor(
