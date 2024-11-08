@@ -1,12 +1,20 @@
 {
-  "workspaces": [
-    "timestep"
-  ],
+  "name": "timestep",
+  "version": "0.1.0",
+  "description": "fixed timestep for the browser",
+  "type": "module",
+  "main": "dist/mod.js",
   "scripts": {
-    "build": "npm run build --workspaces",
+    "build": "npx tsc --build",
+    "test": "node node_modules/jackrabbit/nodejs_cli/bin/mod.js --file ./dist/mod.test.js",
     "fmt": "npx prettier --write ./"
   },
   "devDependencies": {
-    "typescript": "^5.4.5"
-  }
+    "@types/node": "^22.9.0",
+    "jackrabbit": "github:wolfpup-software/jackrabbit-js",
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.3"
+  },
+  "author": "wolfpup",
+  "license": "BSD-3-Clause"
 }
