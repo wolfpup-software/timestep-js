@@ -1,4 +1,2 @@
 import * as timestepTest from "./timestep.test.js";
-export const testModules = [
-    timestepTest,
-];
+export const testModules = [timestepTest];
