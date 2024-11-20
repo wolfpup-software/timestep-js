@@ -20,10 +20,7 @@ class Timestep implements TimestepImpl {
 	#intervalMs: number;
 	#boundLoop: (now: DOMHighResTimeStamp) => void;
 
-	constructor(
-		renderer: RendererImpl,
-		intervalMs: number,
-	) {
+	constructor(renderer: RendererImpl, intervalMs: number) {
 		this.#rc = renderer;
 		this.#intervalMs = Math.max(min_step_6, intervalMs);
 		this.#boundLoop = this.#loop.bind(this);
