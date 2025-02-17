@@ -15,7 +15,9 @@ import { Renderer } from "my/application/renderer.ts";
 let renderer = new Renderer();
 
 const timestep = new Timestep(renderer, 10);
+
 timestep.start();
+timestep.stop();
 ```
 
 ## License
