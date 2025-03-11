@@ -2,12 +2,13 @@ import { Timestep } from "timestep";
 import { Renderer } from "./renderer.js";
 
 const canvas = document.querySelector("canvas");
+let rect = canvas.getBoundingClientRect();
 
-const renderer = new Renderer();
-const timestep = new Timestep(10, renderer);
+const renderer = new Renderer(canvas);
+const timestep = new Timestep({ renderer, intervalMs: 10 });
 
 timestep.start();
 
 setTimeout(function () {
 	timestep.stop();
-}, 1000);
+}, 5000);

@@ -20,11 +20,12 @@ class Renderer {
 	render(intervalMs, integrationRemainderMs) {
 		this.renderCount += 1;
 	}
+	error(e) {}
 }
 async function testIntegrationAndRender() {
 	const assertions = [];
 	const renderer = new Renderer();
-	const timestep = new Timestep(10, renderer);
+	const timestep = new Timestep({ renderer, intervalMs: 10 });
 	timestep.start();
 	await sleep(1000);
 	timestep.stop();

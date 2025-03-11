@@ -1,34 +1,49 @@
 export { Timestep };
 let min_step_6 = (1 / 6) * 1000;
 class Timestep {
-	#timestamp = performance.now();
-	#accumulator = 0;
-	#receipt;
-	#rc;
-	#intervalMs;
+	#renderer;
+	#state;
 	#boundLoop;
-	constructor(intervalMs, renderer) {
-		this.#rc = renderer;
-		this.#intervalMs = Math.min(min_step_6, intervalMs);
-		console.log(this.#intervalMs);
+	constructor(params) {
 		this.#boundLoop = this.#loop.bind(this);
+		let { renderer, intervalMs, maxIntegrationMS } = params;
+		let interval = Math.min(min_step_6, intervalMs ?? min_step_6);
+		let inverseInterval = 1 / interval;
+		this.#renderer = renderer;
+		this.#state = {
+			accumulator: 0,
+			intervalMs: interval,
+			inverseInterval,
+			maxIntegrationMS: maxIntegrationMS ?? 250,
+			prevTimestamp: undefined,
+			receipt: undefined,
+		};
 	}
 	start() {
-		if (this.#receipt) return;
-		this.#receipt = window.requestAnimationFrame(this.#boundLoop);
+		if (this.#state.receipt) return;
+		this.#state.prevTimestamp = performance.now();
+		this.#state.receipt = window.requestAnimationFrame(this.#boundLoop);
 	}
 	stop() {
-		window.cancelAnimationFrame(this.#receipt);
-		this.#receipt = undefined;
+		window.cancelAnimationFrame(this.#state.receipt);
+		this.#state.receipt = undefined;
 	}
 	#loop(now) {
-		this.#accumulator += now - this.#timestamp;
-		this.#timestamp = now;
-		while (this.#accumulator > this.#intervalMs) {
-			this.#rc.integrate(this.#intervalMs);
-			this.#accumulator -= this.#intervalMs;
+		this.#state.receipt = window.requestAnimationFrame(this.#boundLoop);
+		// send "error" to renderer if "max delay"
+		let delta = now - this.#state.prevTimestamp;
+		if (delta > this.#state.maxIntegrationMS) {
+			this.#renderer.error(
+				new Error("Timestep exceeded maximum integration time."),
+			);
 		}
-		this.#rc.render(this.#intervalMs, this.#accumulator);
-		this.#receipt = window.requestAnimationFrame(this.#boundLoop);
+		this.#state.accumulator += now - this.#state.prevTimestamp;
+		this.#state.prevTimestamp = now;
+		while (this.#state.accumulator > this.#state.intervalMs) {
+			this.#renderer.integrate(this.#state.intervalMs);
+			this.#state.accumulator -= this.#state.intervalMs;
+		}
+		let integrated = this.#state.accumulator * this.#state.inverseInterval;
+		this.#renderer.render(this.#state.intervalMs, integrated);
 	}
 }
