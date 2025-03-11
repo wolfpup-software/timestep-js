@@ -1,6 +1,6 @@
-export type { TimestepInterface, RendererInterface };
+export type { TimestepInterface, IntegratorInterface };
 export { Timestep };
-interface RendererInterface {
+interface IntegratorInterface {
     integrate(msInterval: number): void;
     render(msInterval: number, remainderDelta: number): void;
     error(err: Error): void;
@@ -10,7 +10,7 @@ interface TimestepInterface {
     stop(): void;
 }
 interface Params {
-    renderer: RendererInterface;
+    integrator: IntegratorInterface;
     msMaxIntegration?: number;
     msInterval?: number;
 }

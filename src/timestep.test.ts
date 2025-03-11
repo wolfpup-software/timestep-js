@@ -1,4 +1,4 @@
-import type { RendererInterface } from "./timestep.js";
+import type { IntegratorInterface } from "./timestep.js";
 
 import { Timestep } from "./timestep.js";
 
@@ -10,7 +10,7 @@ function sleep(time: number): Promise<void> {
 	});
 }
 
-class Renderer implements RendererInterface {
+class Integrator implements IntegratorInterface {
 	integrateCount: number = 0;
 	renderCount: number = 0;
 
@@ -28,8 +28,8 @@ class Renderer implements RendererInterface {
 async function testIntegrationAndRender() {
 	const assertions = [];
 
-	const renderer = new Renderer();
-	const timestep = new Timestep({ renderer, msInterval: 10 });
+	const integrator = new Integrator();
+	const timestep = new Timestep({ integrator, msInterval: 10 });
 
 	timestep.start();
 
@@ -37,11 +37,11 @@ async function testIntegrationAndRender() {
 
 	timestep.stop();
 
-	if (renderer.integrateCount < 100) {
+	if (integrator.integrateCount < 100) {
 		assertions.push("failed to integrate enough times");
 	}
 
-	if (renderer.renderCount < 10) {
+	if (integrator.renderCount < 10) {
 		assertions.push("failed to render enough times");
 	}
 

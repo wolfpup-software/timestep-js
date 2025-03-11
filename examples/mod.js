@@ -1,5 +1,5 @@
 import { Timestep } from "timestep";
-import { Renderer } from "./renderer.js";
+import { Renderer } from "./integrator.js";
 
 const canvas = document.querySelector("canvas");
 

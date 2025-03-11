@@ -14,12 +14,12 @@ class Renderer {
 		this.#ctx = canvas.getContext("2d");
 	}
 
-	integrate(intervalMs) {
-		integrate(intervalMs, this.#canvas);
+	integrate(msInterval) {
+		integrate(msInterval, this.#canvas);
 	}
 
-	render(intervalMs, integrationRemainderMs) {
-		render(intervalMs, integrationRemainderMs, this.#canvas, this.#ctx);
+	render(msInterval, deltaRemainder) {
+		render(msInterval, deltaRemainder, this.#canvas, this.#ctx);
 	}
 
 	error(e) {

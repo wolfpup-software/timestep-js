@@ -6,7 +6,7 @@ function sleep(time) {
         }, time);
     });
 }
-class Renderer {
+class Integrator {
     integrateCount = 0;
     renderCount = 0;
     integrate(msInterval) {
@@ -19,15 +19,15 @@ class Renderer {
 }
 async function testIntegrationAndRender() {
     const assertions = [];
-    const renderer = new Renderer();
-    const timestep = new Timestep({ renderer, msInterval: 10 });
+    const integrator = new Integrator();
+    const timestep = new Timestep({ integrator, msInterval: 10 });
     timestep.start();
     await sleep(1000);
     timestep.stop();
-    if (renderer.integrateCount < 100) {
+    if (integrator.integrateCount < 100) {
         assertions.push("failed to integrate enough times");
     }
-    if (renderer.renderCount < 10) {
+    if (integrator.renderCount < 10) {
         assertions.push("failed to render enough times");
     }
     return assertions;

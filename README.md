@@ -4,29 +4,38 @@ A fixed timestep.
 
 ## How to use
 
-### Renderer
+### Integrator
 
-Create an object that implements the following interface:
+`Timestep` relies on an `integrator` to connect a game loop to state and renders.
+
+Create the following interface:
 
 ```ts
-// my_renderer.ts
+// my_integrator.ts
 
-import type { RendererInterface } from "timestep";
+import type { IntegratorInterface } from "timestep";
 
-class Renderer implements RendererInterface {
-	integrate(intervalMs: number): void {
+class Integrator implements IntegratorInterface {
+	integrate(msInterval: number): void {
 		// tick through physics step
 	}
 
-	render(intervalMs: number, remainderMs: number): void {
-		// draw to canvas or update dom
+	render(msInterval: number, deltaRemainder: number): void {
+		// Draw to canvas or update dom.
+		//
+		// Interpolate between [previous state, current state]
+		// with the delta remainder [0, 1].
+	}
+
+	error(e: Error) {
+		// maximum integration time was exceeded
 	}
 }
 ```
 
 The `integrate` function is called between renders.
 
-After integration, the `render` funtion is called and the timestep remainder is pass
+After integration, the `render` funtion is called and given the timestep remainder.
 
 ### Timestep
 
@@ -34,10 +43,11 @@ Pass a `Renderer` to an instance of `Timestep`.
 
 ```ts
 import { Timestep } from "timestep";
-import { Renderer } from "my_renderer.ts";
+import { Integrator } from "my_integrator.ts";
 
-let renderer = new Renderer();
-const timestep = new Timestep(10, renderer);
+let msInterval = 10; // millisecond integration interval
+let integrator = new Integrator();
+const timestep = new Timestep({ msInterval, integrator });
 ```
 
 Then call `start` or `stop` where appropriate.
@@ -46,6 +56,14 @@ Then call `start` or `stop` where appropriate.
 timestep.start();
 timestep.stop();
 ```
+
+### Example
+
+Checkout a
+(
+[code](https://github.com/wolfpup-software/timestep-js/tree/main/examples) |
+[live](https://wolfpup-software.github.io/timestep-js/examples/)
+) example
 
 ## License
 

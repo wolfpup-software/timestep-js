@@ -1,9 +1,9 @@
-export type { TimestepInterface, RendererInterface };
+export type { TimestepInterface, IntegratorInterface };
 export { Timestep };
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame#return_value
 
-interface RendererInterface {
+interface IntegratorInterface {
 	integrate(msInterval: number): void;
 	render(msInterval: number, remainderDelta: number): void;
 	error(err: Error): void;
@@ -17,7 +17,7 @@ interface TimestepInterface {
 let MIN_STEP = 1;
 
 interface Params {
-	renderer: RendererInterface;
+	integrator: IntegratorInterface;
 	msMaxIntegration?: number;
 	msInterval?: number;
 }
@@ -33,14 +33,14 @@ interface State {
 
 class Timestep implements TimestepInterface {
 	#boundLoop: (now: DOMHighResTimeStamp) => void;
-	#renderer: RendererInterface;
+	#integrator: IntegratorInterface;
 	#state: State;
 
 	constructor(params: Params) {
 		this.#boundLoop = this.#loop.bind(this);
 
-		let { renderer, msInterval, msMaxIntegration } = params;
-		this.#renderer = renderer;
+		let { integrator, msInterval, msMaxIntegration } = params;
+		this.#integrator = integrator;
 		this.#state = getState(msInterval, msMaxIntegration);
 	}
 
@@ -57,7 +57,7 @@ class Timestep implements TimestepInterface {
 
 	#loop(now: DOMHighResTimeStamp) {
 		this.#state.receipt = window.requestAnimationFrame(this.#boundLoop);
-		integrateAndRender(this.#renderer, this.#state, now);
+		integrateAndRender(this.#integrator, this.#state, now);
 	}
 }
 
@@ -76,23 +76,23 @@ function getState(intrvlMs: number = MIN_STEP, msMaxIntegration: number = 250) {
 }
 
 function integrateAndRender(
-	renderer: RendererInterface,
+	integrator: IntegratorInterface,
 	state: State,
 	now: DOMHighResTimeStamp,
 ) {
 	const delta = now - state.prevTimestamp;
 	if (delta > state.msMaxIntegration) {
-		renderer.error(new Error("Timestep exceeded maximum integration time."));
+		integrator.error(new Error("Timestep exceeded maximum integration time."));
 	}
 
 	state.accumulator += now - state.prevTimestamp;
 	state.prevTimestamp = now;
 
 	while (state.accumulator > state.msInterval) {
-		renderer.integrate(state.msInterval);
+		integrator.integrate(state.msInterval);
 		state.accumulator -= state.msInterval;
 	}
 
 	const integrated = state.accumulator * state.inverseInterval;
-	renderer.render(state.msInterval, integrated);
+	integrator.render(state.msInterval, integrated);
 }

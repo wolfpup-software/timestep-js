@@ -8,7 +8,8 @@ let rect = {
 	y: 50,
 };
 
-function integrate(intervalMs, canvas) {
+// updates "state" of rectangle
+function integrate(msInterval, canvas) {
 	rect.x.add(speed);
 
 	// wrap along x axis
@@ -17,9 +18,10 @@ function integrate(intervalMs, canvas) {
 	}
 }
 
-function render(intervalMs, delta, canvas, ctx) {
+// draw rect to the canvas
+function render(_msInterval, deltaRemainder, canvas, ctx) {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	ctx.fillRect(rect.x.interpolate(delta), rect.y, size, size);
+	ctx.fillRect(rect.x.interpolate(deltaRemainder), rect.y, size, size);
 }
 
 export { integrate, render };

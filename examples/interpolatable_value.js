@@ -1,12 +1,12 @@
 /*
 	Example of an Interpolatable Value.
 	
-	A "value" is a tuple defined by [prev state, current state].
-
-	"Translation" needs to move both values in a tuple.
+	A "value" is can be a tuple defined by [prev state, current state].
 	
 	Interpolation returns the previous state and a percentage of the
 	difference defined by a delta value between [0-1].
+
+	Operations like "translation" need update BOTH [prev state, current state].
 */
 
 export class InterpolatableValue {
