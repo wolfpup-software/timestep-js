@@ -39,7 +39,7 @@ After integration, the `render` funtion is called and given the timestep remaind
 
 ### Timestep
 
-Pass a `Renderer` to an instance of `Timestep`.
+Pass an `Integrator` to an instance of `Timestep`.
 
 ```ts
 import { Timestep } from "timestep";
@@ -63,7 +63,7 @@ Checkout a
 (
 [code](https://github.com/wolfpup-software/timestep-js/tree/main/examples) |
 [live](https://wolfpup-software.github.io/timestep-js/examples/)
-) example
+) example.
 
 ## License
 
