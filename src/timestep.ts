@@ -59,7 +59,6 @@ class Timestep implements TimestepInterface {
 
 	#loop(now: DOMHighResTimeStamp) {
 		this.#state.receipt = window.requestAnimationFrame(this.#boundLoop);
-
 		integrateAndRender(this.#renderer, this.#state, now);
 	}
 }
