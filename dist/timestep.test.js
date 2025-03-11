@@ -1,9 +1,4 @@
 import { Timestep } from "./timestep.js";
-// create a render
-// create a time step
-// run time step for 1 second
-// make sure many integrations occured
-// make sure multiple renders occured
 function sleep(time) {
     return new Promise((resolve) => {
         setTimeout(() => {

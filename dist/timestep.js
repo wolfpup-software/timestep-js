@@ -1,9 +1,9 @@
 export { Timestep };
 let MIN_STEP = 1;
 class Timestep {
+    #boundLoop;
     #renderer;
     #state;
-    #boundLoop;
     constructor(params) {
         this.#boundLoop = this.#loop.bind(this);
         let { renderer, msInterval, msMaxIntegration } = params;
@@ -30,8 +30,8 @@ function getState(intrvlMs = MIN_STEP, msMaxIntegration = 250) {
     let inverseInterval = 1 / msInterval;
     return {
         accumulator: 0,
-        msInterval,
         inverseInterval,
+        msInterval,
         msMaxIntegration: msMaxIntegration ?? 250,
         prevTimestamp: undefined,
         receipt: undefined,

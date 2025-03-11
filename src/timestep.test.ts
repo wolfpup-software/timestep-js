@@ -2,14 +2,6 @@ import type { RendererInterface } from "./timestep.js";
 
 import { Timestep } from "./timestep.js";
 
-// create a render
-// create a time step
-
-// run time step for 1 second
-
-// make sure many integrations occured
-// make sure multiple renders occured
-
 function sleep(time: number): Promise<void> {
 	return new Promise((resolve) => {
 		setTimeout(() => {

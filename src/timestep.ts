@@ -32,16 +32,14 @@ interface State {
 }
 
 class Timestep implements TimestepInterface {
+	#boundLoop: (now: DOMHighResTimeStamp) => void;
 	#renderer: RendererInterface;
 	#state: State;
-
-	#boundLoop: (now: DOMHighResTimeStamp) => void;
 
 	constructor(params: Params) {
 		this.#boundLoop = this.#loop.bind(this);
 
 		let { renderer, msInterval, msMaxIntegration } = params;
-
 		this.#renderer = renderer;
 		this.#state = getState(msInterval, msMaxIntegration);
 	}
@@ -69,8 +67,8 @@ function getState(intrvlMs: number = MIN_STEP, msMaxIntegration: number = 250) {
 
 	return {
 		accumulator: 0,
-		msInterval,
 		inverseInterval,
+		msInterval,
 		msMaxIntegration: msMaxIntegration ?? 250,
 		prevTimestamp: undefined,
 		receipt: undefined,
@@ -96,6 +94,5 @@ function integrateAndRender(
 	}
 
 	const integrated = state.accumulator * state.inverseInterval;
-
 	renderer.render(state.msInterval, integrated);
 }
