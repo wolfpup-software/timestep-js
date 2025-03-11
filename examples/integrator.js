@@ -5,7 +5,7 @@ import { integrate, render } from "./sliding_square.js";
 
 	This renderer interacts with the "app" in sliding_square.js
 */
-class Renderer {
+class Integrator {
 	#canvas;
 	#ctx;
 
@@ -27,4 +27,4 @@ class Renderer {
 	}
 }
 
-export { Renderer };
+export { Integrator };
