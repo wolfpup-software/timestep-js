@@ -1,22 +1,22 @@
 export type { TimestepInterface, RendererInterface };
 export { Timestep };
 interface RendererInterface {
-    integrate(intervalMs: number): void;
-    render(intervalMs: number, remainderDelta: number): void;
-    error(err: Error): void;
+	integrate(msInterval: number): void;
+	render(msInterval: number, remainderDelta: number): void;
+	error(err: Error): void;
 }
 interface TimestepInterface {
-    start(): void;
-    stop(): void;
+	start(): void;
+	stop(): void;
 }
 interface Params {
-    renderer: RendererInterface;
-    maxIntegrationMS?: number;
-    intervalMs?: number;
+	renderer: RendererInterface;
+	msMaxIntegration?: number;
+	msInterval?: number;
 }
 declare class Timestep implements TimestepInterface {
-    #private;
-    constructor(params: Params);
-    start(): void;
-    stop(): void;
+	#private;
+	constructor(params: Params);
+	start(): void;
+	stop(): void;
 }

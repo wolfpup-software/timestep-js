@@ -22,11 +22,11 @@ class Renderer implements RendererInterface {
 	integrateCount: number = 0;
 	renderCount: number = 0;
 
-	integrate(intervalMs: number) {
+	integrate(msInterval: number) {
 		this.integrateCount += 1;
 	}
 
-	render(intervalMs: number, integrationRemainderMs: number) {
+	render(msInterval: number, integrationRemainderMs: number) {
 		this.renderCount += 1;
 	}
 
@@ -37,7 +37,7 @@ async function testIntegrationAndRender() {
 	const assertions = [];
 
 	const renderer = new Renderer();
-	const timestep = new Timestep({ renderer, intervalMs: 10 });
+	const timestep = new Timestep({ renderer, msInterval: 10 });
 
 	timestep.start();
 

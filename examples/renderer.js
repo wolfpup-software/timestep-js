@@ -1,5 +1,10 @@
-import { integrate, render } from "./falling_squares.js";
+import { integrate, render } from "./sliding_square.js";
 
+/*
+	An example of a "renderer" class.
+
+	This renderer interacts with the "app" in sliding_square.js
+*/
 class Renderer {
 	#canvas;
 	#ctx;
@@ -10,13 +15,10 @@ class Renderer {
 	}
 
 	integrate(intervalMs) {
-		// console.log("integrate!", intervalMs);
-		// tick through state
 		integrate(intervalMs, this.#canvas);
 	}
 
 	render(intervalMs, integrationRemainderMs) {
-		// console.log("render", intervalMs, integrationRemainderMs);
 		render(intervalMs, integrationRemainderMs, this.#canvas, this.#ctx);
 	}
 
