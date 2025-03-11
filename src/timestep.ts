@@ -1,56 +1,98 @@
-interface RendererImpl {
-	integrate: (stepMs: number, intervalMs: number) => void;
-	render: (lastStepMs: number, intervalMs: number) => void;
+export type { TimestepInterface, IntegratorInterface };
+export { Timestep };
+
+// https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame#return_value
+
+interface IntegratorInterface {
+	integrate(msInterval: number): void;
+	render(msInterval: number, remainderDelta: number): void;
+	error(err: Error): void;
 }
 
-interface TimestepImpl {
+interface TimestepInterface {
 	start(): void;
 	stop(): void;
 }
 
-let min_step_6 = (1 / 6) * 1000;
+let MIN_STEP = 1;
 
-class Timestep implements TimestepImpl {
-	#timestamp = performance.now();
-	#time = 0;
-	#accumulator = 0;
-	#receipt?: number = undefined;
+interface Params {
+	integrator: IntegratorInterface;
+	msMaxIntegration?: number;
+	msInterval?: number;
+}
 
-	#rc: RendererImpl;
-	#intervalMs: number;
+interface State {
+	accumulator: number;
+	msInterval: number;
+	inverseInterval: number;
+	msMaxIntegration: number;
+	prevTimestamp?: DOMHighResTimeStamp;
+	receipt?: number;
+}
+
+class Timestep implements TimestepInterface {
 	#boundLoop: (now: DOMHighResTimeStamp) => void;
+	#integrator: IntegratorInterface;
+	#state: State;
 
-	constructor(renderer: RendererImpl, intervalMs: number) {
-		this.#rc = renderer;
-		this.#intervalMs = Math.max(min_step_6, intervalMs);
+	constructor(params: Params) {
 		this.#boundLoop = this.#loop.bind(this);
+
+		let { integrator, msInterval, msMaxIntegration } = params;
+		this.#integrator = integrator;
+		this.#state = getState(msInterval, msMaxIntegration);
 	}
 
 	start() {
-		if (this.#receipt) return;
-		this.#receipt = window.requestAnimationFrame(this.#boundLoop);
+		if (this.#state.receipt) return;
+		this.#state.receipt = window.requestAnimationFrame(this.#boundLoop);
+		this.#state.prevTimestamp = performance.now();
 	}
 
 	stop() {
-		window.cancelAnimationFrame(this.#receipt);
-		this.#receipt = undefined;
+		window.cancelAnimationFrame(this.#state.receipt);
+		this.#state.receipt = undefined;
 	}
 
 	#loop(now: DOMHighResTimeStamp) {
-		this.#accumulator += now - this.#timestamp;
-		this.#timestamp = now;
-
-		while (this.#accumulator > this.#intervalMs) {
-			this.#rc.integrate(this.#time, this.#intervalMs);
-
-			this.#accumulator -= this.#intervalMs;
-			this.#time += this.#intervalMs;
-		}
-
-		this.#rc.render(this.#accumulator, this.#intervalMs);
-		this.#receipt = window.requestAnimationFrame(this.#boundLoop);
+		this.#state.receipt = window.requestAnimationFrame(this.#boundLoop);
+		integrateAndRender(this.#integrator, this.#state, now);
 	}
 }
 
-export type { TimestepImpl, RendererImpl };
-export { Timestep };
+function getState(intrvlMs: number = MIN_STEP, msMaxIntegration: number = 250) {
+	let msInterval = Math.max(intrvlMs, MIN_STEP);
+	let inverseInterval = 1 / msInterval;
+
+	return {
+		accumulator: 0,
+		inverseInterval,
+		msInterval,
+		msMaxIntegration: msMaxIntegration ?? 250,
+		prevTimestamp: undefined,
+		receipt: undefined,
+	};
+}
+
+function integrateAndRender(
+	integrator: IntegratorInterface,
+	state: State,
+	now: DOMHighResTimeStamp,
+) {
+	const delta = now - state.prevTimestamp;
+	if (delta > state.msMaxIntegration) {
+		integrator.error(new Error("Timestep exceeded maximum integration time."));
+	}
+
+	state.accumulator += now - state.prevTimestamp;
+	state.prevTimestamp = now;
+
+	while (state.accumulator > state.msInterval) {
+		integrator.integrate(state.msInterval);
+		state.accumulator -= state.msInterval;
+	}
+
+	const integrated = state.accumulator * state.inverseInterval;
+	integrator.render(state.msInterval, integrated);
+}

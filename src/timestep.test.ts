@@ -1,14 +1,6 @@
-import type { RendererImpl } from "./timestep.js";
+import type { IntegratorInterface } from "./timestep.js";
 
 import { Timestep } from "./timestep.js";
-
-// create a render
-// create a time step
-
-// run time step for 1 second
-
-// make sure many integrations occured
-// make sure multiple renders occured
 
 function sleep(time: number): Promise<void> {
 	return new Promise((resolve) => {
@@ -18,24 +10,26 @@ function sleep(time: number): Promise<void> {
 	});
 }
 
-class Renderer implements RendererImpl {
+class Integrator implements IntegratorInterface {
 	integrateCount: number = 0;
 	renderCount: number = 0;
 
-	integrate(stepMs: number, intervalMs: number) {
+	integrate(msInterval: number) {
 		this.integrateCount += 1;
 	}
 
-	render() {
+	render(msInterval: number, integrationRemainderMs: number) {
 		this.renderCount += 1;
 	}
+
+	error(e: Error) {}
 }
 
 async function testIntegrationAndRender() {
 	const assertions = [];
 
-	const renderer = new Renderer();
-	const timestep = new Timestep(renderer, 10);
+	const integrator = new Integrator();
+	const timestep = new Timestep({ integrator, msInterval: 10 });
 
 	timestep.start();
 
@@ -43,11 +37,11 @@ async function testIntegrationAndRender() {
 
 	timestep.stop();
 
-	if (renderer.integrateCount < 100) {
+	if (integrator.integrateCount < 100) {
 		assertions.push("failed to integrate enough times");
 	}
 
-	if (renderer.renderCount < 10) {
+	if (integrator.renderCount < 10) {
 		assertions.push("failed to render enough times");
 	}
 
